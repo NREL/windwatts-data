@@ -1,0 +1,111 @@
+---
+title: "windwatts_data fetching timeseries and map data"
+format:
+    html:
+        code-fold: true
+jupyter: python3
+---
+
+This notebook guides the user regarding how to fetch timeseries data for a specific/all location at runtime.
+
+Note: The users AWS credentials should be exported in the created environment.
+
+```{python}
+# import package
+from windwatts_data import WTKLedClient1224
+```
+
+We have imported WTKLedClient1224 class to work with WTK hourly average data.
+
+```{python}
+# Initialize object to the WTKLedClient
+# Since the config file is in same directory "notebooks" as the ".ipynb" file, the below config path works.
+wtk = WTKLedClient1224(config_path='./1224_config.json')
+```
+## Robust function for fetching both timeseries and map.
+
+**fetch_filtered_data_1224()** is more robust version to fetch both timeseries(location specific) and map(non-locations specific) data which provides user with more parameters to retrieve data.
+Please refer to the documentation to know more about the function's features.
+The **fetch_timeseries_1224()**, **fetch_windspeed_map_1224()** and **fetch_winddirection_map_1224()** were the safe function as they restricted user in terms of paramaters as it was done intentionally to safe gaurd user from performing costly queries if same can be achieved using earlier functions.
+
+**fetch_filtered_data_1224()*** gives the user full freedom to perform complex queries.
+
+```{python}
+# fetching desired columns for specified location and year.
+df = wtk.fetch_filtered_data_1224(columns=['windspeed_100m','winddirection_100m','mohr'],lat=39.90270,long=-82.98916,years=[2001],n_nearest=2)
+```
+
+```{python}
+df
+```
+
+This function can do the same thing as fetch_windspeed_timeseries_1224(). But it offers more control over selection of more columns, selection by time and doesn't restrict user to a number of nearest location(1-16) as it was in case of the safe function. n_nearest is optional here when given along with latitude and longitude. No need to specify n_nearest when you are not specifying latitude and longitude as all locations will be considered.
+
+## Fetching timeseries data
+```{python}
+# fetching desired columns for specified location, year, month and hour.
+df = wtk.fetch_filtered_data_1224(columns=['windspeed_100m','winddirection_100m','mohr'],lat=39.90270,long=-82.98916,years=[2001],months=[2],hours=[12])
+```
+
+```{python}
+df
+```
+
+```{python}
+# user can also specify multiple years, months and hours.
+df = wtk.fetch_filtered_data_1224(columns=['windspeed_100m','winddirection_100m','mohr'],lat=39.90270,long=-82.98916,years=[2001],months=[2,3],hours=[12,1],n_nearest=2)
+```
+
+
+```{python}
+df
+```
+
+
+```{python}
+# Instead of column names, users can also specify desired height(s) to extract columns specific to a height(s).
+df = wtk.fetch_filtered_data_1224(heights=[100],lat=39.90270,long=-82.98916,years=[2001,2002],months=[2],hours=[12])
+```
+
+
+```{python}
+df
+```
+
+```{python}
+# If a specific height doesn't exist in the columns, then the columns adjacent to the given height values will be returned. Columns with height 20m doesn't exist in the data.
+df = wtk.fetch_filtered_data_1224(heights=[20],lat=39.90270,long=-82.98916,years=[2001,2002],months=[2],hours=[12])
+```
+
+```{python}
+df
+```
+Note: You can either mention specific column names or specific heights, not both.
+
+## Fetching map data
+```{python}
+# fetching windspeed map data at 100m for a specific time.
+df = wtk.fetch_filtered_data_1224(columns=['windspeed_100m'],years=[2001],months=[2],hours=[12])
+```
+
+```{python}
+df
+```
+
+```{python}
+# fetching windspeed map data at 100m for multiple time periods.
+df = wtk.fetch_filtered_data_1224(columns=['windspeed_100m','winddirection_100m','mohr','year'],years=[2001,2002],months=[2,4],hours=[12,15])
+```
+
+```{python}
+df
+```
+
+```{python}
+df['month'],df['hour'] = df['mohr']//100, df['mohr']%100
+print(df['year'].value_counts())
+print(df['month'].value_counts())
+print(df['hour'].value_counts())
+```
+
+Note: User can observe that this function is more robust in fetching data compared to safe functions. It is advised to keep the query cost in the mind. The above query scanned around **23 Gb** of data in **9 minutes** to retrieve results. Athena charges $5 per TB scanned.

@@ -1,0 +1,17 @@
+build
+dist
+windwatts_data/__pycache__
+.DS_store
+/notebooks/myenv
+/notebooks/*.json
+/notebooks/*.qmd
+/notebooks/downloads
+/windwatts_data.egg-info
+tests
+.pytest_cache
+.venv
+old
+.github
+era5_location_data.pkl.gz
+windwatts_era5_client.py
+pytest.ini

@@ -1,0 +1,10 @@
+{
+    "region_name": "us-west-2",
+    "bucket_name": "wtk-led",
+    "database": "wtk_database",
+    "output_location": "s3://wtk-test-athena-results/",
+    "output_bucket": "wtk-test-athena-results",
+    "athena_table_name": "wtktestpp",
+    "alt_athena_table_name": "wtktestpnoindex",
+    "athena_workgroup":"MyAthenaWorkgroup"
+}

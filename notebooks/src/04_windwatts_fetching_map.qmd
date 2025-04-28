@@ -1,0 +1,79 @@
+---
+title: "windwatts_data fetching map data"
+format:
+    html:
+        code-fold: true
+jupyter: python3
+---
+
+This notebook guides the user regarding how to fetch map data for a specific/all location at runtime.
+
+Note: The users AWS credentials should be exported in the created environment.
+
+```{python}
+# import package
+from windwatts_data import WTKLedClient1224
+```
+
+We have imported WTKLedClient1224 class to work with WTK hourly average data.
+
+```{python}
+# Initialize object to the WTKLedClient
+# Since the config file is in same directory "notebooks" as the ".ipynb" file, the below config path works.
+wtk_1224_client = WTKLedClient1224(config_path='./1224_config.json')
+```
+
+## Safe function for fetching map data.
+
+Note: fetch_windspeed_map_1224() is a safe function because it requires the user to specify all paramaters. This results in fetching one record from each of 2.51M files for each year. Even though its is an expensive operation resulting in scanning of around 7GB of data(for below query), there are other robust methods discussed in later notebooks which gives users more freedom in terms of parameters.
+
+```{python}
+# Retrieving windspeed map for height 100m at specific year, month and hour.
+df = wtk_1224_client.fetch_windspeed_map_1224(height=100,year=2001,hour=4,month=6)
+```
+Takes around 4 min to fetch results as its scanning all locations.
+```{python}
+df
+```
+
+```{python}
+# mapping index to latitude and longitude
+df_mapped = wtk_1224_client.map_index_to_coordinates(df)
+```
+
+```{python}
+df_mapped
+```
+
+```{python}
+# Plotting windspeed map
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.hexbin(df_mapped['longitude'], df_mapped['latitude'], C=df_mapped['windspeed_100m'], gridsize=80, cmap='viridis')
+plt.colorbar(label='Windspeed at 100m (m/s)')
+plt.title('Hexbin Windspeed Map')
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+plt.show()
+```
+
+Fetching winddirection map.
+```{python}
+df_wd = wtk_1224_client.fetch_winddirection_map_1224(height=100,year=2001,hour=4,month=6)
+```
+
+```{python}
+df_wd
+```
+
+```{python}
+from windrose import WindroseAxes
+# Create windrose plot
+fig = plt.figure(figsize=(5, 5))  # Width=10, Height=8 in inches
+ax = WindroseAxes.from_ax(fig=fig)
+ax.bar(df_wd['winddirection_100m'], df['windspeed_100m'], normed=True, opening=0.8, edgecolor='white')
+ax.set_legend(loc=(1.05, 0.8)) 
+plt.suptitle("Windrose Plot at 100m for June 4AM", fontsize=12, y=1)  
+plt.show()
+```

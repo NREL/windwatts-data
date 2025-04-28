@@ -1,0 +1,40 @@
+---
+title: "windwatts_data downloading csv files"
+format:
+    html:
+        code-fold: true
+jupyter: python3
+---
+
+This notebook guides the user regarding how to download timeseries data as .csv files.
+
+Note: The users AWS credentials should be exported in the created environment.
+
+```{python}
+# import package
+from windwatts_data import WTKLedClient1224
+```
+
+We have imported WTKLedClient1224 class.
+
+```{python}
+# Initialize object to the WTKLedClient
+# Since the config file is in same directory "notebooks" as the ".ipynb" file, the below config path works.
+wtk_1224_client = WTKLedClient1224(config_path='./1224_config.json')
+```
+
+### Download csv.gz files
+```{python}
+# Downloading data of nearest location for 2 years with respect to lat and long.
+wtk_1224_client.download_1224_data(lat=51.0,long=-162.0,years=[2001,2002])
+```
+
+This will download the csv.gz files in the downloads folder of current directory.
+
+```{python}
+## Downloading data of 4 nearest locations for a single year with respect to lat and long. Data is available for years 2001 to 2020.
+wtk_1224_client.download_1224_data(lat=51.0,long=-162.0,n_nearest=4,years=[2008])
+```
+
+Please refer to package documentation for more details about this function.
+

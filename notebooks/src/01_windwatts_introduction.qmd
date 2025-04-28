@@ -1,0 +1,40 @@
+---
+title: "windwatts_data introduction"
+format:
+    html:
+        code-fold: true
+jupyter: python3
+---
+
+This notebook gives a basic idea of how to setup and use the windwatts_data package.
+
+Note: The users AWS credentials should be exported in the created environment.
+
+### Import class from the package
+```{python}
+# Import class WTKLedClient1224 to work with WTK-Led 1224 Data
+from windwatts_data import WTKLedClient1224
+```
+
+### Assign config file
+```{python}
+# give path to the create json config file as config_path
+wtk_1224_client = WTKLedClient1224(config_path='./1224_config.json')
+```
+
+
+### Fetch column names
+```{python}
+# Getting Column names of WTK 1224 Data
+cols = wtk_1224_client.get_column_names()
+for col in cols:
+    print(col)
+```
+
+It is suggested to go through the columns as it helps in understanding at what heights does the data have for columns like windspeed and winddirection.
+
+### Retrieve grid locations
+```{python}
+# Print location gdf of the wtk data to investigate about available grid locations.
+print(wtk_1224_client.get_location_gdf())
+```

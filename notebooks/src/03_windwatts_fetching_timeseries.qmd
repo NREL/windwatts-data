@@ -1,0 +1,167 @@
+---
+title: "windwatts_data fetching timeseries data"
+format:
+    html:
+        code-fold: true
+jupyter: python3
+---
+
+This notebook guides the user regarding how to fetch timeseries data for a specific/all location at runtime.
+
+Note: The users AWS credentials should be exported in the created environment.
+
+```{python}
+# import package
+import pandas as pd
+import matplotlib.pyplot as plt
+from windwatts_data import WTKLedClient1224
+from windrose import WindroseAxes
+```
+
+We have imported WTKLedClient1224 class to work with WTK hourly average data.
+
+```{python}
+# Initialize object to the WTKLedClient1224 and WTKLedClientHourly
+# Since the config file is in same directory "notebooks" as the ".ipynb" file, the below config path works.
+wtk_1224_client = WTKLedClient1224(config_path='./1224_config.json')
+```
+
+## Safe function for fetching timeseries.
+
+Note: fetch_timeseries_1224() is a safe function(fast and less cost) as it doesn't allow user to fetch data related to more that 16 nearest location with respect to the given coordinates.
+
+### Fetching windspeed and winddirection timeseries at height 100m for a single location for year 2001.
+```{python}
+df = wtk_1224_client.fetch_timeseries_1224(lat=39.92824,long=-105.23437,heights=[100],years=[2001])
+```
+
+
+```{python}
+print(df)
+```
+In 1224 timeseries data, each file has 288 rows(24 hours * 12 months)[hourly averages for each month] for each location at a specific year. mohr stands for MMHH.
+
+
+```{python}
+# parsing mohr column in datetime to plot timeseries data.
+df['month'],df['hour'] = df['mohr']//100, df['mohr']%100
+df['datetime'] = pd.to_datetime(dict(year=df['year'],month=df['month'],day=1,hour=df['hour']))
+df = df.sort_values('datetime')
+```
+
+```{python}
+print(df)
+```
+
+### plotting timeseries data
+```{python}
+plt.figure(figsize=(10,5))
+plt.plot(df['datetime'],df['windspeed_100m'],marker='o')
+plt.ylabel("Windspeed at 100m (m/s)")
+plt.xlabel("Datetime")
+plt.grid(True)
+plt.title("Windspeed in 2001 at Coordinates(39.92824,-105.23437)")
+```
+
+```{python}
+# Windspeed statistics
+agg = df.reset_index().pivot(index="month",columns="hour",values="windspeed_100m")
+agg
+```
+
+```{python}
+plt.imshow(agg)
+plt.xlabel("Hour")
+plt.ylabel("Month")
+plt.title("12 x 24 Mean Windspeed (m/s) at 100m")
+plt.colorbar()
+```
+
+### plotting windrose for winddirection and windspeed at 100m
+```{python}
+fig = plt.figure(figsize=(5, 5))  # Width=10, Height=8 in inches
+ax = WindroseAxes.from_ax(fig=fig)
+ax.bar(df['winddirection_100m'], df['windspeed_100m'], normed=True, opening=0.8, edgecolor='white')
+ax.set_legend(loc=(1.05, 0.8)) 
+plt.suptitle("Windrose Plot (100m)", fontsize=16, y=1)  
+plt.show()
+```
+
+### Fetching windspeed and winddirection timeseries at height 100m for a single location for all 10 years.
+```{python}
+df = wtk_1224_client.fetch_timeseries_1224(lat=39.92824,long=-105.23437,heights=[100], years=[2001,2002,2003,2004,2005,2006,2007,2008,2009,2010])
+```
+
+```{python}
+df
+```
+
+```{python}
+# parsing mohr column in datetime to plot timeseries data.
+df['month'],df['hour'] = df['mohr']//100, df['mohr']%100
+df['datetime'] = pd.to_datetime(dict(year=df['year'],month=df['month'],day=1,hour=df['hour']))
+df = df.sort_values('datetime')
+```
+
+### plotting timeseries data for march of all 10 years.
+```{python}
+df_march = df[df['month']==3]
+plt.figure(figsize=(10,5))
+plt.plot(df_march['datetime'],df_march['windspeed_100m'],marker='o')
+plt.ylabel("Windspeed at 100m (m/s)")
+plt.xlabel("Datetime")
+plt.grid(True)
+plt.title("Windspeed in March 2001-2010 at Coordinates(39.92824,-105.23437)")
+```
+
+```{python}
+df
+```
+
+### Fetching windspeed and winddirection timeseries dataframe at height 100m and 40m for a 2 locations(the second one as the nearest neighbor) for years 2001 and 2004.
+```{python}
+df = wtk_1224_client.fetch_timeseries_1224(lat=39.92824,long=-105.23437,heights=[100,40],years=[2001,2004],n_nearest=2)
+```
+
+```{python}
+df
+```
+
+```{python}
+df['index'].value_counts()
+```
+Each index maps to an unique coordinate on the grid. We have 2 unique indexes here because user requested data for 2 nearest locations.
+
+```{python}
+# location_gdf for wtk data
+loc_gdf = wtk_1224_client.get_location_gdf()
+print(loc_gdf)
+```
+
+```{python}
+# Retrieving coordinates from index values
+print(loc_gdf.loc[loc_gdf['index'] == '0f1c63'])
+print(loc_gdf.loc[loc_gdf['index'] == '0f1c64'])
+```
+
+### Fetching windspeed and winddirection timeseries dataframe at height 20m for a 2 locations(the second one as the nearest neighbor) for year 2001.
+```{python}
+df = wtk_1224_client.fetch_timeseries_1224(lat=39.92824,long=-105.23437,heights=[20],years=[2001,2004],n_nearest=2)
+```
+
+```{python}
+df['year'].value_counts()
+```
+
+```{python}
+df['index'].value_counts()
+```
+
+We have 576 records because we have data for 2 location per year. 
+
+
+Note: If you see the columns using wtk.get_column_names(), the height 20m doesn't exist in the data. So, the data at the adjacent heights will be fetched.
+
+```{python}
+
+```

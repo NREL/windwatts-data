@@ -385,35 +385,6 @@ Please refer to the data section of the [documentation](https://pages.github.nre
         cd windwatts-data
         pip install .
         ```
-
-    2. **Download the package file** from the versions folder in the repo. Click on the package and select "raw" to download.
-    
-        **For MacOS**
-        - To install the package, go to your project directory and create a python environment using "python/python3" or "conda".
-            ```
-            python3 -m venv env_name
-            ```
-        - Activate the python environment.
-            ```
-            source ./env_name/bin/activate
-            ```
-        - Install the package using pip command.
-            ```
-            pip install /path/to/downloaded/package/file
-            ```
-        **For Windows**
-        -  To install the package, go to your project directory and create a python environment using "python/python3" or "conda".
-            ```
-            python3 -m venv env_name
-            ```
-        - Activate the python environment.
-            ```
-            ./env_name/Scripts/activate
-            ```
-        - Install the package using pip command.
-            ```
-            pip install /path/to/downloaded/package/file
-            ```
 7. **Setting up Config file**
     - Within your project directory create a json file called **config_file.json**.
     - We have to include the names of the resources we created in previous steps.
@@ -476,16 +447,3 @@ This python package is currently being developed and maintained by Sameer Shaik 
 
 Copyright (c) 2025, National Renewable Energy Laboratory (NREL)
 All rights reserved. See LICENSE for additional information.
-
-
-
-
-
-
-
-
-
-
-
-
-

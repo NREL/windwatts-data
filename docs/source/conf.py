@@ -36,7 +36,7 @@ epub_show_urls = 'footnote'
 
 html_context = {
     "display_github": True, # Integrate GitHub
-    "github_repo": "wind-toolkit/wtk_led_client", # Repo name
+    "github_repo": "NREL/windwatts-data/", # Repo name
     "github_version": "main", # Version
     "conf_py_path": "docs/source/", # Path in the checkout to the docs root
 }
@@ -54,7 +54,7 @@ language = 'English'
 
 html_static_path = ['_static']
 
-repository_url = f"https://github.nrel.gov/wind-toolkit/wtk_led_client"
+repository_url = f"https://github.com/NREL/windwatts-data/"
 html_context = {
     "menu_links": [
         (

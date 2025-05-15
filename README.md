@@ -2,7 +2,7 @@
 
  **windwatts_data** is a Python package which facilitates querying, filtering, downloading and analyzing climate data like WTK-LED Climate.
 
-Please refer to the data section of the [documentation](https://pages.github.nrel.gov/wind-toolkit/wtk_led_client/) to learn about different types of data sources before proceeding with setup.
+Please refer to the data section of the [documentation](https://nrel.github.io/windwatts-data/) to learn about different types of data sources before proceeding with setup.
 
 ## Cost Analysis
   - Use of this python package requires user to create their own AWS resources to access a public s3 bucket (**wtk-led**) which acts as a data source. Even though the bucket is public, any kind of data access using this package will result in cost applied to the user. The owner of the bucket (**NREL**) only pays for its storage cost.
